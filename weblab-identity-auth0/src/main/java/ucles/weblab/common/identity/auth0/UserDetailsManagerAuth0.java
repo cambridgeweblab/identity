@@ -69,6 +69,8 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
                 .toArray(String[]::new);
         final Map<String, Object> appMetadata = new HashMap<>();
         appMetadata.put("authorities", roles);
+        // copy all entries to app metadata
+        u.getMetadata().forEach(appMetadata::put);
 
         User dto = new User(AUTH0_CONNECTION);
         dto.setName(u.getEmail());
@@ -77,13 +79,14 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         dto.setAppMetadata(appMetadata);
         Request<User> request = getManagementAPI().users().create(dto);
         try {
+            @SuppressWarnings("unused")
             User created = request.execute();
         } catch (Auth0Exception e) {
             throw new AuthenticationServiceException("Unable to add user due to Auth0 exception", e);
         }
     }
 
-    public void createRole(GrantedAuthority authority) {
+    private void createRole(GrantedAuthority authority) {
 //        Assert.isTrue(!roleExists(authority.getAuthority()), "Role already exists");
 //        try {
 //            managementAPI.addRole(authority.getAuthority(), null, null);

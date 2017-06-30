@@ -15,8 +15,11 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ucles.weblab.common.identity.ExtendedUser;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
@@ -60,7 +63,8 @@ public class UserDetailsManagerAuth0_IT {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         String username = "auth0|" + uuid;
         String email = uuid + "@tapina.com";
-        userDetailsManager.createUser(new ExtendedUser(username, "letmein", createAuthorityList("ROLE_ADMIN"), email));
+        Map<String, Object> metadata = singletonMap("ielts", singletonMap("roId", 12));
+        userDetailsManager.createUser(new ExtendedUser(username, "letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
     }
 }
 
