@@ -59,12 +59,6 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         Assert.isTrue(u.getUsername() == null || !userExists(u.getUsername()), "User already exists");
 
         final String[] roles = u.getAuthorities().stream()
-                .peek(role -> {
-                    if (!roleExists(role.getAuthority())) {
-                        // log.debug("User {} needs role {} creating", user.getUsername(), role);
-                        createRole(role);
-                    }
-                })
                 .map(GrantedAuthority::getAuthority)
                 .toArray(String[]::new);
         final Map<String, Object> appMetadata = new HashMap<>();
@@ -84,15 +78,6 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         } catch (Auth0Exception e) {
             throw new AuthenticationServiceException("Unable to add user due to Auth0 exception", e);
         }
-    }
-
-    private void createRole(GrantedAuthority authority) {
-//        Assert.isTrue(!roleExists(authority.getAuthority()), "Role already exists");
-//        try {
-//            managementAPI.addRole(authority.getAuthority(), null, null);
-//        } catch (UserStoreException e) {
-//            throw new AuthenticationServiceException("Unable to add role due to Auth0 exception", e);
-//        }
     }
 
     @Override
@@ -121,10 +106,6 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
             }
             throw new AuthenticationServiceException("Unable to check for existing user due to Auth0 exception", e);
         }
-    }
-
-    public boolean roleExists(String rolename) {
-        return true;// FIXME: Could hard code +to an expected list?  Or delegate to somewhere
     }
 
     @Override
