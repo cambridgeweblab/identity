@@ -9,9 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.IfProfileValue;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ucles.weblab.common.identity.ExtendedUser;
@@ -22,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@IfProfileValue(name = "spring.profiles.active", value = "local") // We have to configure this and run locally to test against live Auth0 system
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @TestPropertySource(
         locations = {"classpath:application-test.properties", "classpath:application-test-local.properties"})
