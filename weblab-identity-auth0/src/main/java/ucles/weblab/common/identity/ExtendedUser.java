@@ -15,12 +15,13 @@ public class ExtendedUser extends User {
     private final Map<String, Object> metadata;
 
     /**
-     *
+     * This is opinionated towards systems that do not allow/require a username, but return a unique user_id.
+     * As the superclass requires a username, it will be set to <code>"-ignored-"</code>
      * @param metadata e.g. singletonMap("ielts", singletonMap("roId", 12))
      */
-    public ExtendedUser(String username, String password, Collection<? extends GrantedAuthority> authorities,
+    public ExtendedUser(String password, Collection<? extends GrantedAuthority> authorities,
                         String email, Map<String, Object> metadata) {
-        super(username, password, authorities);
+        super("-ignored-", password, authorities);
         this.email = email;
         this.metadata = metadata;
     }

@@ -1,5 +1,6 @@
 package ucles.weblab.common.identity.auth0;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
@@ -30,7 +32,7 @@ import static org.springframework.security.core.authority.AuthorityUtils.createA
 public class UserDetailsManagerAuth0_IT {
 
     @Autowired
-    UserDetailsManager userDetailsManager;
+    UserDetailsManagerAuth0 userDetailsManager;
 
     @Configuration
     @EnableAutoConfiguration
@@ -59,11 +61,13 @@ public class UserDetailsManagerAuth0_IT {
 
     @Test
     public void it_createsAUser() {
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        String username = "auth0|" + uuid;
+        String uuid = UUID.randomUUID().toString();
         String email = uuid + "@tapina.com";
         Map<String, Object> metadata = singletonMap("ielts", singletonMap("roId", 12));
-        userDetailsManager.createUser(new ExtendedUser(username, "letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
+        String id = userDetailsManager.createUserForUserId(
+                new ExtendedUser("letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
+        assertThat(id).startsWith("auth0|");
+        assertThat(id).hasSize(30);
     }
 }
 

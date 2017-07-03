@@ -52,11 +52,20 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         return new ManagementAPI(domain, token);
     }
 
+    /** Create a user, returning the Auth0 user_id so that we have it for all other API calls */
+    public String createUserForUserId(UserDetails user) {
+        return createUserInternal(user).getId();
+    }
+
     @Override
     public void createUser(UserDetails user) {
+        createUserInternal(user);
+    }
+
+    private User createUserInternal(UserDetails user) {
         Assert.isTrue(user instanceof ExtendedUser, "User must be an instanceof ExtendedUser");
         ExtendedUser u = (ExtendedUser) user;
-        Assert.isTrue(u.getUsername() == null || !userExists(u.getUsername()), "User already exists");
+        Assert.isTrue(u.getUsername() == "-ignored-" || !userExists(u.getUsername()), "User already exists");
 
         final String[] roles = u.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -73,8 +82,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         dto.setAppMetadata(appMetadata);
         Request<User> request = getManagementAPI().users().create(dto);
         try {
-            @SuppressWarnings("unused")
-            User created = request.execute();
+            return request.execute();
         } catch (Auth0Exception e) {
             throw new AuthenticationServiceException("Unable to add user due to Auth0 exception", e);
         }
@@ -82,7 +90,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     @Override
     public void updateUser(UserDetails user) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); // https://auth0.com/docs/api/management/v2/user-search
     }
 
     @Override
@@ -96,7 +104,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     }
 
     @Override
-    public boolean userExists(String username) {
+    public boolean userExists(String username) { // See https://auth0.com/docs/api/management/v2/user-search to search by email
         try {
             User user = getManagementAPI().users().get(username, null).execute();
             return user != null;
@@ -110,7 +118,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); // https://auth0.com/docs/api/management/v2/user-search
     }
 }
 
