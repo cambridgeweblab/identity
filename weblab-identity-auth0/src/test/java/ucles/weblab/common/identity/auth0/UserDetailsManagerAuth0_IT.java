@@ -15,7 +15,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ucles.weblab.common.identity.ExtendedUser;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,10 +39,10 @@ public class UserDetailsManagerAuth0_IT {
         @Value("${auth0.domain}")
         String domain;
 
-        @Value("${auth0.mgmt.clientId}")
+        @Value("${auth0.mgmt.client-id}")
         String clientId;
 
-        @Value("${auth0.mgmt.clientSecret}")
+        @Value("${auth0.mgmt.client-secret}")
         String clientSecret;
 
 
