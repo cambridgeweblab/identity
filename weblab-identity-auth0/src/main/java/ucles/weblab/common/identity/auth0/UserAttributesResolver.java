@@ -15,11 +15,11 @@ public class UserAttributesResolver {
 
     private final Authentication authentication;
 
-    String getUsername() {
+    public String getUsername() {
         return authentication.getName();
     }
 
-    String getNickname() {
+    public String getNickname() {
         if (authentication instanceof AuthenticationJsonWebToken) {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
             return details.getClaim("nickname").asString();
@@ -27,7 +27,7 @@ public class UserAttributesResolver {
         return (String) authentication.getPrincipal();
     }
 
-    boolean hasAuthority(String role) {
+    public boolean hasAuthority(String role) {
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority).anyMatch(role::equalsIgnoreCase);
     }
