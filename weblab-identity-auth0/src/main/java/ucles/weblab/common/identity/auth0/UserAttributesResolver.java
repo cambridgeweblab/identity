@@ -1,7 +1,7 @@
 package ucles.weblab.common.identity.auth0;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.spring.security.api.authentication.AuthenticationJsonWebToken;
+import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +20,7 @@ public class UserAttributesResolver {
     }
 
     public String getNickname() {
-        if (authentication instanceof AuthenticationJsonWebToken) {
+        if (authentication instanceof JwtAuthentication) {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
             return details.getClaim("nickname").asString();
         }
