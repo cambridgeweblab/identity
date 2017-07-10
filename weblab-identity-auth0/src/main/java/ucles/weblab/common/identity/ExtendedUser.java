@@ -34,4 +34,20 @@ public class ExtendedUser extends User {
         this.givenName = givenName;
         this.familyName = familyName;
     }
+
+    /**
+     * Create a user
+     * @param metadata e.g. singletonMap("ielts", singletonMap("roId", 12))
+     */
+    public ExtendedUser(
+            String username,
+            String givenName, String familyName,
+            String password, Collection<? extends GrantedAuthority> authorities,
+            String email, Map<String, Object> metadata) {
+        super(username, password, authorities);
+        this.email = email;
+        this.metadata = metadata;
+        this.givenName = givenName;
+        this.familyName = familyName;
+    }
 }

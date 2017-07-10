@@ -29,7 +29,7 @@ import static java.util.stream.Collectors.toList;
 public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     private static final String AUTH0_CONNECTION = "Username-Password-Authentication";
-    public static final String AUTHORITIES = "authorities";
+    private static final String AUTHORITIES = "authorities";
 
     private final String domain;
 
@@ -74,21 +74,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         ExtendedUser u = (ExtendedUser) user;
         Assert.isTrue(u.getUsername().equals("-ignored-") || !userExists(u.getUsername()), "User already exists");
 
-        final String[] roles = u.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toArray(String[]::new);
-        final Map<String, Object> appMetadata = new HashMap<>();
-        appMetadata.put(AUTHORITIES, roles);
-        // copy all entries to app metadata
-        u.getMetadata().forEach(appMetadata::put);
-
-        User dto = new User(AUTH0_CONNECTION);
-        dto.setName(u.getGivenName());
-        dto.setGivenName(u.getGivenName());
-        dto.setFamilyName(u.getFamilyName());
-        dto.setPassword(u.getPassword());
-        dto.setEmail(u.getEmail());
-        dto.setAppMetadata(appMetadata);
+        User dto = toAuth0User(u);
         Request<User> request = getManagementAPI().users().create(dto);
         try {
             return request.execute();
@@ -98,8 +84,13 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     }
 
     @Override
-    public void updateUser(UserDetails user) {
-        throw new UnsupportedOperationException(); // https://auth0.com/docs/api/management/v2/user-search
+    public void updateUser(UserDetails userDetails) {
+        User user = toAuth0User((ExtendedUser) userDetails);
+        try {
+            getManagementAPI().users().update(userDetails.getUsername(), user).execute();
+        } catch (Auth0Exception e) {
+            throw new RuntimeException(e.getMessage(), e); // TODO: Review exception to use
+        }
     }
 
     @Override
@@ -142,6 +133,25 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         } catch (Auth0Exception e) {
             throw new UsernameNotFoundException(username, e);
         }
+    }
+
+    private User toAuth0User(ExtendedUser u) {
+        final String[] roles = u.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toArray(String[]::new);
+        final Map<String, Object> appMetadata = new HashMap<>();
+        appMetadata.put(AUTHORITIES, roles);
+        // copy all entries to app metadata
+        u.getMetadata().forEach(appMetadata::put);
+
+        User dto = new User(AUTH0_CONNECTION);
+        dto.setName(u.getGivenName());
+        dto.setGivenName(u.getGivenName());
+        dto.setFamilyName(u.getFamilyName());
+        dto.setPassword(u.getPassword());
+        dto.setEmail(u.getEmail());
+        dto.setAppMetadata(appMetadata);
+        return dto;
     }
 
     private Collection<GrantedAuthority> extractAuthorities(Map<String, Object> appMetadata) {

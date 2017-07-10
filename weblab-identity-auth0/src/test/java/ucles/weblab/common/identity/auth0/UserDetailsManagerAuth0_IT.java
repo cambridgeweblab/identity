@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.test.annotation.IfProfileValue;
@@ -62,7 +62,7 @@ public class UserDetailsManagerAuth0_IT {
     }
 
     @Test
-    public void it_createsAndDeletesAUser() {
+    public void it_createsUpdatesAndDeletesAUser() {
         String uuid = UUID.randomUUID().toString();
         String email = uuid + "@tapina.com";
         Map<String, Object> metadata = singletonMap("ielts", singletonMap("roId", 12));
@@ -70,8 +70,18 @@ public class UserDetailsManagerAuth0_IT {
                 new ExtendedUser("Tommy", "Tippee","letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
         assertThat(id).startsWith("auth0|");
         assertThat(id).hasSize(30);
-        UserDetails user = userDetailsManager.loadUserByUsername(id);
+
+        ExtendedUser user = (ExtendedUser) userDetailsManager.loadUserByUsername(id);
+        assertThat(user.getAuthorities()).containsOnly(new SimpleGrantedAuthority("ROLE_ADMIN"));
         assertThat(user).isNotNull();
+
+        // UPDATE
+        ExtendedUser removeAdminUser = new ExtendedUser(id, "Tommy", "Tippee", "letmein", createAuthorityList("ROLE_USER"), email, metadata);
+        userDetailsManager.updateUser(removeAdminUser);
+        ExtendedUser user2 = (ExtendedUser) userDetailsManager.loadUserByUsername(id);
+        assertThat(user2.getAuthorities()).containsOnly(new SimpleGrantedAuthority("ROLE_USER"));
+
+        // DELETE
         userDetailsManager.deleteUser(id);
         try {
             userDetailsManager.loadUserByUsername(id);
