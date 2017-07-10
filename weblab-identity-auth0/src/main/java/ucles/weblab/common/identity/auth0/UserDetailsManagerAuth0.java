@@ -76,7 +76,9 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         u.getMetadata().forEach(appMetadata::put);
 
         User dto = new User(AUTH0_CONNECTION);
-        dto.setName(u.getEmail());
+        dto.setName(u.getGivenName());
+        dto.setGivenName(u.getGivenName());
+        dto.setFamilyName(u.getFamilyName());
         dto.setPassword(u.getPassword());
         dto.setEmail(u.getEmail());
         dto.setAppMetadata(appMetadata);

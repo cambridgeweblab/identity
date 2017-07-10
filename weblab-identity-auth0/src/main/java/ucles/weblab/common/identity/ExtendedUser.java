@@ -12,6 +12,11 @@ public class ExtendedUser extends User {
 
     private final String email;
 
+    private final String givenName;
+
+    private final String familyName;
+
+
     private final Map<String, Object> metadata;
 
     /**
@@ -19,10 +24,14 @@ public class ExtendedUser extends User {
      * As the superclass requires a username, it will be set to <code>"-ignored-"</code>
      * @param metadata e.g. singletonMap("ielts", singletonMap("roId", 12))
      */
-    public ExtendedUser(String password, Collection<? extends GrantedAuthority> authorities,
-                        String email, Map<String, Object> metadata) {
+    public ExtendedUser(
+            String givenName, String familyName,
+            String password, Collection<? extends GrantedAuthority> authorities,
+            String email, Map<String, Object> metadata) {
         super("-ignored-", password, authorities);
         this.email = email;
         this.metadata = metadata;
+        this.givenName = givenName;
+        this.familyName = familyName;
     }
 }

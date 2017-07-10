@@ -65,7 +65,7 @@ public class UserDetailsManagerAuth0_IT {
         String email = uuid + "@tapina.com";
         Map<String, Object> metadata = singletonMap("ielts", singletonMap("roId", 12));
         String id = userDetailsManager.createUserForUserId(
-                new ExtendedUser("letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
+                new ExtendedUser("Tommy", "Tippee","letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
         assertThat(id).startsWith("auth0|");
         assertThat(id).hasSize(30);
     }
