@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.test.annotation.IfProfileValue;
 import org.springframework.test.context.TestPropertySource;
@@ -60,7 +62,7 @@ public class UserDetailsManagerAuth0_IT {
     }
 
     @Test
-    public void it_createsAUser() {
+    public void it_createsAndDeletesAUser() {
         String uuid = UUID.randomUUID().toString();
         String email = uuid + "@tapina.com";
         Map<String, Object> metadata = singletonMap("ielts", singletonMap("roId", 12));
@@ -68,6 +70,15 @@ public class UserDetailsManagerAuth0_IT {
                 new ExtendedUser("Tommy", "Tippee","letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
         assertThat(id).startsWith("auth0|");
         assertThat(id).hasSize(30);
+        UserDetails user = userDetailsManager.loadUserByUsername(id);
+        assertThat(user).isNotNull();
+        userDetailsManager.deleteUser(id);
+        try {
+            userDetailsManager.loadUserByUsername(id);
+            Assertions.fail("Should have thrown UserNameNotFoundException");
+        } catch (UsernameNotFoundException e) {
+            // success here
+        }
     }
 }
 

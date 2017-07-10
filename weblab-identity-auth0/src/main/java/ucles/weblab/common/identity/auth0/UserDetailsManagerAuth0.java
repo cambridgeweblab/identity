@@ -9,20 +9,27 @@ import com.auth0.net.Request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 import ucles.weblab.common.identity.ExtendedUser;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 
 @RequiredArgsConstructor
 public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     private static final String AUTH0_CONNECTION = "Username-Password-Authentication";
+    public static final String AUTHORITIES = "authorities";
 
     private final String domain;
 
@@ -65,13 +72,13 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     private User createUserInternal(UserDetails user) {
         Assert.isTrue(user instanceof ExtendedUser, "User must be an instanceof ExtendedUser");
         ExtendedUser u = (ExtendedUser) user;
-        Assert.isTrue(u.getUsername() == "-ignored-" || !userExists(u.getUsername()), "User already exists");
+        Assert.isTrue(u.getUsername().equals("-ignored-") || !userExists(u.getUsername()), "User already exists");
 
         final String[] roles = u.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toArray(String[]::new);
         final Map<String, Object> appMetadata = new HashMap<>();
-        appMetadata.put("authorities", roles);
+        appMetadata.put(AUTHORITIES, roles);
         // copy all entries to app metadata
         u.getMetadata().forEach(appMetadata::put);
 
@@ -97,7 +104,11 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     @Override
     public void deleteUser(String username) {
-        throw new UnsupportedOperationException();
+        try {
+            getManagementAPI().users().delete(username).execute();
+        } catch (Auth0Exception e) {
+            throw new UsernameNotFoundException(username, e);
+        }
     }
 
     @Override
@@ -120,7 +131,25 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        throw new UnsupportedOperationException(); // https://auth0.com/docs/api/management/v2/user-search
+        try {
+            User user = getManagementAPI().users().get(username, null).execute();
+            return new ExtendedUser(user.getGivenName(),
+                    user.getFamilyName(),
+                    "-unknown-",
+                    extractAuthorities(user.getAppMetadata()),
+                    user.getEmail(),
+                    user.getAppMetadata());
+        } catch (Auth0Exception e) {
+            throw new UsernameNotFoundException(username, e);
+        }
+    }
+
+    private Collection<GrantedAuthority> extractAuthorities(Map<String, Object> appMetadata) {
+        @SuppressWarnings("unchecked")
+        List<String> authorities = (List<String>) appMetadata.get(AUTHORITIES);
+        return authorities == null
+                ? emptyList()
+                : authorities.stream().map(SimpleGrantedAuthority::new).collect(toList());
     }
 }
 
