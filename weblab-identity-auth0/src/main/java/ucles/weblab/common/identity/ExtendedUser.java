@@ -16,27 +16,14 @@ public class ExtendedUser extends User {
 
     private final String familyName;
 
-
     private final Map<String, Object> metadata;
 
-    /**
-     * This is opinionated towards systems that do not allow/require a username, but return a unique user_id.
-     * As the superclass requires a username, it will be set to <code>"-ignored-"</code>
-     * @param metadata e.g. singletonMap("ielts", singletonMap("roId", 12))
-     */
-    public ExtendedUser(
-            String givenName, String familyName,
-            String password, Collection<? extends GrantedAuthority> authorities,
-            String email, Map<String, Object> metadata) {
-        super("-ignored-", password, authorities);
-        this.email = email;
-        this.metadata = metadata;
-        this.givenName = givenName;
-        this.familyName = familyName;
-    }
 
     /**
-     * Create a user
+     * Create a user.<br>
+     * @param username
+     *  This is opinionated towards systems that do not allow/require a username, but return a unique user_id.
+     *  As the superclass requires a username, it will be set to <code>"-ignored-"</code> if not provided.
      * @param metadata e.g. singletonMap("ielts", singletonMap("roId", 12))
      */
     public ExtendedUser(
@@ -44,7 +31,7 @@ public class ExtendedUser extends User {
             String givenName, String familyName,
             String password, Collection<? extends GrantedAuthority> authorities,
             String email, Map<String, Object> metadata) {
-        super(username, password, authorities);
+        super(username == null ? "-ignored-" : username, password, authorities);
         this.email = email;
         this.metadata = metadata;
         this.givenName = givenName;

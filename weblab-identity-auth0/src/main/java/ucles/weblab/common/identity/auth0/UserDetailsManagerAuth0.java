@@ -124,7 +124,8 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
             User user = getManagementAPI().users().get(username, null).execute();
-            return new ExtendedUser(user.getGivenName(),
+            return new ExtendedUser(username,
+                    user.getGivenName(),
                     user.getFamilyName(),
                     "-unknown-",
                     extractAuthorities(user.getAppMetadata()),
