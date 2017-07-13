@@ -30,6 +30,8 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     private static final String AUTH0_CONNECTION = "Username-Password-Authentication";
     private static final String AUTHORITIES = "authorities";
+    private static final String GIVEN_NAME = "givenName";
+    private static final String FAMILY_NAME = "familyName";
 
     private final String domain;
 
@@ -86,6 +88,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     @Override
     public void updateUser(UserDetails userDetails) {
         User user = toAuth0User((ExtendedUser) userDetails);
+        user.setPassword(null); // hack to get around non-null password in ExtendedUser.
         try {
             getManagementAPI().users().update(userDetails.getUsername(), user).execute();
         } catch (Auth0Exception e) {
@@ -125,8 +128,8 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         try {
             User user = getManagementAPI().users().get(username, null).execute();
             return new ExtendedUser(username,
-                    user.getGivenName(),
-                    user.getFamilyName(),
+                    (String) user.getUserMetadata().get(GIVEN_NAME),
+                    (String) user.getUserMetadata().get(FAMILY_NAME),
                     "-unknown-",
                     extractAuthorities(user.getAppMetadata()),
                     user.getEmail(),
@@ -137,21 +140,25 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     }
 
     private User toAuth0User(ExtendedUser u) {
-        final String[] roles = u.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toArray(String[]::new);
-        final Map<String, Object> appMetadata = new HashMap<>();
-        appMetadata.put(AUTHORITIES, roles);
-        // copy all entries to app metadata
-        u.getMetadata().forEach(appMetadata::put);
-
         User dto = new User(AUTH0_CONNECTION);
-        dto.setName(u.getGivenName());
-        dto.setGivenName(u.getGivenName());
-        dto.setFamilyName(u.getFamilyName());
         dto.setPassword(u.getPassword());
         dto.setEmail(u.getEmail());
+
+        // APP_METADATA
+        String[] roles = u.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toArray(String[]::new);
+
+        Map<String, Object> appMetadata = new HashMap<>();
+        appMetadata.put(AUTHORITIES, roles);
+        u.getMetadata().forEach(appMetadata::put);
         dto.setAppMetadata(appMetadata);
+
+        // USER_METADATA
+        Map<String, Object> userMetadata = new HashMap<>();
+        userMetadata.put(GIVEN_NAME, u.getGivenName());
+        userMetadata.put(FAMILY_NAME, u.getFamilyName());
+        dto.setUserMetadata(userMetadata);
         return dto;
     }
 
