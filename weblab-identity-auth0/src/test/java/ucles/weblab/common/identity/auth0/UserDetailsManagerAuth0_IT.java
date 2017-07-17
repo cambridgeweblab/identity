@@ -18,6 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ucles.weblab.common.identity.ExtendedUser;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
@@ -70,6 +71,9 @@ public class UserDetailsManagerAuth0_IT {
                 new ExtendedUser(null,"Tommy", "Tippee","letmein", createAuthorityList("ROLE_ADMIN"), email, metadata));
         assertThat(id).startsWith("auth0|");
         assertThat(id).hasSize(30);
+
+        URI changePasswordUri = userDetailsManager.getChangePasswordUri(id, URI.create("http://localhost/come/back/here"));
+        assertThat(changePasswordUri).isNotNull();
 
         ExtendedUser user = (ExtendedUser) userDetailsManager.loadUserByUsername(id);
         assertThat(user.getAuthorities()).containsOnly(new SimpleGrantedAuthority("ROLE_ADMIN"));

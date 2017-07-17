@@ -4,6 +4,7 @@ import com.auth0.client.auth.AuthAPI;
 import com.auth0.client.mgmt.ManagementAPI;
 import com.auth0.exception.APIException;
 import com.auth0.exception.Auth0Exception;
+import com.auth0.json.mgmt.tickets.PasswordChangeTicket;
 import com.auth0.json.mgmt.users.User;
 import com.auth0.net.Request;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.util.Assert;
 import ucles.weblab.common.identity.ExtendedUser;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +112,25 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Obtains a URI to a web page where the user can reset their password.
+     * Once the user has reset their password, they will be redirected to the specified URI.
+     *
+     * @param userId the user ID (note, not email address) e.g. the return value from {@link #createUserForUserId(UserDetails)}.
+     * @param redirectUri the URI to send the user to after they have reset their password
+     * @return the URI to give to the user to reset their password e.g. in an e-mail or browser redirection.
+     */
+    public URI getChangePasswordUri(String userId, URI redirectUri) {
+        final PasswordChangeTicket request = new PasswordChangeTicket(userId);
+        request.setResultUrl(redirectUri.toString());
+        try {
+            final PasswordChangeTicket response = getManagementAPI().tickets().requestPasswordChange(request).execute();
+            return URI.create(response.getTicket());
+        } catch (Auth0Exception e) {
+            throw new RuntimeException(e.getMessage(), e); // TODO: Review exception to use.
+        }
+    }
+
     @Override
     public boolean userExists(String username) { // See https://auth0.com/docs/api/management/v2/user-search to search by email
         try {
@@ -143,6 +164,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         User dto = new User(AUTH0_CONNECTION);
         dto.setPassword(u.getPassword());
         dto.setEmail(u.getEmail());
+        dto.setVerifyEmail(false);
 
         // APP_METADATA
         String[] roles = u.getAuthorities().stream()
