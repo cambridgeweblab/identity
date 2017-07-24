@@ -32,8 +32,8 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
     private static final String AUTH0_CONNECTION = "Username-Password-Authentication";
     private static final String AUTHORITIES = "authorities";
-    private static final String GIVEN_NAME = "givenName";
-    private static final String FAMILY_NAME = "familyName";
+    static final String GIVEN_NAME = "givenName";
+    static final String FAMILY_NAME = "familyName";
 
     private final String domain;
 

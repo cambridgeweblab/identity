@@ -16,7 +16,7 @@ public class ExtendedUser extends User {
 
     private final String familyName;
 
-    private final Map<String, Object> metadata;
+    private final Map<String, ?> metadata;
 
 
     /**
@@ -30,7 +30,7 @@ public class ExtendedUser extends User {
             String username,
             String givenName, String familyName,
             String password, Collection<? extends GrantedAuthority> authorities,
-            String email, Map<String, Object> metadata) {
+            String email, Map<String, ?> metadata) {
         super(username == null ? "-ignored-" : username, password, authorities);
         this.email = email;
         this.metadata = metadata;

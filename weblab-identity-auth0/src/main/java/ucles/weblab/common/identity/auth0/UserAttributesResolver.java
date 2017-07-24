@@ -5,6 +5,8 @@ import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import ucles.weblab.common.identity.ExtendedUser;
 
 /**
  * A strategy for resolving attributes based on what authentication mechanism we are using.
@@ -24,7 +26,11 @@ public class UserAttributesResolver {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
             return details.getClaim("nickname").asString();
         }
-        return (String) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof ExtendedUser) {
+            return (String) ((ExtendedUser) principal).getMetadata().get("nickname");
+        }
+        return (String) principal;
     }
 
     public boolean hasAuthority(String role) {
