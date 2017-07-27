@@ -50,10 +50,13 @@ public class UserDetailsManagerAuth0_IT {
         @Value("${auth0.mgmt.client-secret}")
         String clientSecret;
 
+        @Value("${auth0.mgmt.connection-name}")
+        String connectionName;
+
 
         @Bean
         UserDetailsManager userDetailsManager() {
-            return new UserDetailsManagerAuth0(domain, clientId, clientSecret);
+            return new UserDetailsManagerAuth0(domain, connectionName, clientId, clientSecret);
         }
     }
 

@@ -30,12 +30,14 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 public class UserDetailsManagerAuth0 implements UserDetailsManager {
 
-    private static final String AUTH0_CONNECTION = "Username-Password-Authentication";
     private static final String AUTHORITIES = "authorities";
     static final String GIVEN_NAME = "givenName";
     static final String FAMILY_NAME = "familyName";
 
     private final String domain;
+
+    /** Connection in Auth0 for where credentials are stored. e.g. Username-Password-Authentication */
+    private final String connectionName;
 
     private final String clientId;
 
@@ -161,7 +163,7 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
     }
 
     private User toAuth0User(ExtendedUser u) {
-        User dto = new User(AUTH0_CONNECTION);
+        User dto = new User(connectionName);
         dto.setPassword(u.getPassword());
         dto.setEmail(u.getEmail());
         dto.setVerifyEmail(false);
