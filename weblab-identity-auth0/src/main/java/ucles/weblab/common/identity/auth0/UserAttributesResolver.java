@@ -5,11 +5,11 @@ import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import ucles.weblab.common.identity.ExtendedUser;
 
 /**
  * A strategy for resolving attributes based on what authentication mechanism we are using.
+ *
  * @see org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter for other ideas
  */
 @RequiredArgsConstructor
@@ -19,6 +19,14 @@ public class UserAttributesResolver {
 
     public String getUsername() {
         return authentication.getName();
+    }
+
+    public String getUserId() {
+        if (authentication instanceof JwtAuthentication) {
+            DecodedJWT details = (DecodedJWT) authentication.getDetails();
+            return details.getClaim("sub").asString();
+        }
+        throw new UnsupportedOperationException("getUserId is not supported for " + authentication.getClass().toString());
     }
 
     public String getNickname() {
