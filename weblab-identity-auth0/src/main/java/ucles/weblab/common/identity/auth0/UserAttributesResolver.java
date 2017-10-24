@@ -26,6 +26,10 @@ public class UserAttributesResolver {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
             return details.getClaim("sub").asString();
         }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof ExtendedUser) {
+            return (String) ((ExtendedUser) principal).getMetadata().get("sub");
+        }
         throw new UnsupportedOperationException("getUserId is not supported for " + authentication.getClass().toString());
     }
 
