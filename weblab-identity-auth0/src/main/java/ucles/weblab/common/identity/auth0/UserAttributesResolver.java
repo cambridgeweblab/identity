@@ -3,6 +3,8 @@ package ucles.weblab.common.identity.auth0;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import ucles.weblab.common.identity.ExtendedUser;
@@ -13,6 +15,7 @@ import ucles.weblab.common.identity.ExtendedUser;
  * @see org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter for other ideas
  */
 @RequiredArgsConstructor
+@Slf4j
 public class UserAttributesResolver {
 
     private final Authentication authentication;
@@ -26,9 +29,15 @@ public class UserAttributesResolver {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
             return details.getClaim("sub").asString();
         }
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof ExtendedUser) {
-            return (String) ((ExtendedUser) principal).getMetadata().get("sub");
+
+        if (authentication.getPrincipal() instanceof ExtendedUser) {
+            return (String) ((ExtendedUser) authentication.getPrincipal()).getMetadata().get("sub");
+        }
+
+        if (authentication instanceof TestingAuthenticationToken) {
+            String uid = "user|" + authentication.getName();
+            log.warn("Returning fabricated id: {} for getUserId for TestingAuthenticationToken", uid);
+            return uid;
         }
         throw new UnsupportedOperationException("getUserId is not supported for " + authentication.getClass().toString());
     }
