@@ -33,7 +33,7 @@ public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationC
         }
 
         String username = (String) map.get(usernameAttributeKey);
-        Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
+        Collection<? extends GrantedAuthority> authorities = getAuthorities(username, map);
         ExtendedUser user = new ExtendedUser(username,
                 (String) map.get(GIVEN_NAME), (String) map.get(FAMILY_NAME),
                 "n/a pwd",
@@ -41,7 +41,7 @@ public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationC
         return new UsernamePasswordAuthenticationToken(user, "N/A", authorities);
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(Map<String, ?> map) {
+    private Collection<? extends GrantedAuthority> getAuthorities(String username, Map<String, ?> map) {
         Object authorities = map.get(AUTHORITIES);
         if (authorities instanceof String) {
             return AuthorityUtils.commaSeparatedStringToAuthorityList((String) authorities);
@@ -50,7 +50,7 @@ public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationC
             return AuthorityUtils.commaSeparatedStringToAuthorityList(StringUtils
                     .collectionToCommaDelimitedString((Collection<?>) authorities));
         }
-        log.warn("No authorities found in JWT. Returning empty list");
+        log.warn("No authorities found in JWT for {}. Returning empty list", username);
         return emptyList();
     }
 }
