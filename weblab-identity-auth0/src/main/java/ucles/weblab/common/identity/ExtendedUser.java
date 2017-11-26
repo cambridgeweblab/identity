@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @Getter
+@SuppressWarnings({"PMD.SingularField", "PMD.UnusedPrivateField"})
 public class ExtendedUser extends User {
 
     private final String email;

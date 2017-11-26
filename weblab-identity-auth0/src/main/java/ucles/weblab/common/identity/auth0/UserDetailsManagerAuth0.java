@@ -138,10 +138,12 @@ public class UserDetailsManagerAuth0 implements UserDetailsManager {
         try {
             User user = getManagementAPI().users().get(username, null).execute();
             return user != null;
-        } catch (Auth0Exception e) {
-            if (e instanceof APIException && ((APIException) e).getStatusCode() == 404) {
+        } catch (APIException e) {
+            if (e.getStatusCode() == 404) {
                 return false;
             }
+            throw new AuthenticationServiceException("Unable to check for existing user due to Auth0 exception", e);
+        } catch (Auth0Exception e) {
             throw new AuthenticationServiceException("Unable to check for existing user due to Auth0 exception", e);
         }
     }
