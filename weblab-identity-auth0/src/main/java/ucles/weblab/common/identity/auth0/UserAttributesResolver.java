@@ -4,7 +4,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import ucles.weblab.common.identity.ExtendedUser;
@@ -34,12 +33,9 @@ public class UserAttributesResolver {
             return (String) ((ExtendedUser) authentication.getPrincipal()).getMetadata().get("sub");
         }
 
-        if (authentication instanceof TestingAuthenticationToken) {
-            String uid = "user|" + authentication.getName();
-            log.warn("Returning fabricated id: {} for getUserId for TestingAuthenticationToken", uid);
-            return uid;
-        }
-        throw new UnsupportedOperationException("getUserId is not supported for " + authentication.getClass().toString());
+        String uid = "user|" + authentication.getName();
+        log.warn("Returning fabricated id: {} for getUserId for Authentication: {}", uid, authentication.getClass().toString());
+        return uid;
     }
 
     public String getNickname() {
