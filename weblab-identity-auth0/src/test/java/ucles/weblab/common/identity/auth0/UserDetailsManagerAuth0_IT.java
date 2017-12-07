@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Bean;
@@ -39,24 +40,18 @@ public class UserDetailsManagerAuth0_IT {
 
     @Configuration
     @EnableAutoConfiguration
+    @EnableConfigurationProperties(Auth0Settings.class)
     public static class Config {
 
-        @Value("${auth0.domain}")
-        String domain;
-
-        @Value("${auth0.mgmt.client-id}")
-        String clientId;
-
-        @Value("${auth0.mgmt.client-secret}")
-        String clientSecret;
-
-        @Value("${auth0.mgmt.connection-name}")
-        String connectionName;
-
+        @Autowired
+        Auth0Settings auth0Settings;
 
         @Bean
         UserDetailsManager userDetailsManager() {
-            return new UserDetailsManagerAuth0(domain, connectionName, clientId, clientSecret);
+            return new UserDetailsManagerAuth0(auth0Settings.getDomain(),
+                    auth0Settings.getMgmt().getConnectionName(),
+                    auth0Settings.getMgmt().getClientId(),
+                    auth0Settings.getMgmt().getClientSecret());
         }
     }
 
