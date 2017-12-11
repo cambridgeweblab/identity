@@ -17,9 +17,17 @@ import static java.util.Collections.emptyList;
 import static ucles.weblab.common.identity.auth0.UserDetailsManagerAuth0.FAMILY_NAME;
 import static ucles.weblab.common.identity.auth0.UserDetailsManagerAuth0.GIVEN_NAME;
 
+/**
+ * Responsible for extracting things Spring Security needs.
+ *
+ * For OIDC Conformant JWTs we have to specify a namespace prefix
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationConverter {
+
+    /** Prefix for property within the JWT.  e.g. http://ucles.org.uk/ */
+    private final String namespacePrefix;
 
     private final String usernameAttributeKey;
 
@@ -27,22 +35,27 @@ public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationC
     @Override
     public Authentication extractAuthentication(Map<String, ?> map) {
 
-        if (!map.containsKey(usernameAttributeKey)) {
+        String usernamePath = withNamespace(usernameAttributeKey);
+        if (!map.containsKey(usernamePath)) {
             log.warn("No username attribute: {} found in JWT. Returning null Authentication", usernameAttributeKey);
             return null;
         }
 
-        String username = (String) map.get(usernameAttributeKey);
+        String username = (String) map.get(usernamePath);
         Collection<? extends GrantedAuthority> authorities = getAuthorities(username, map);
         ExtendedUser user = new ExtendedUser(username,
-                (String) map.get(GIVEN_NAME), (String) map.get(FAMILY_NAME),
+                (String) map.get(withNamespace(GIVEN_NAME)), (String) map.get(withNamespace(FAMILY_NAME)),
                 "n/a pwd",
                 authorities, null, map);
         return new UsernamePasswordAuthenticationToken(user, "N/A", authorities);
     }
 
+    private String withNamespace(String key) {
+        return namespacePrefix == null ? key : namespacePrefix + key;
+    }
+
     private Collection<? extends GrantedAuthority> getAuthorities(String username, Map<String, ?> map) {
-        Object authorities = map.get(AUTHORITIES);
+        Object authorities = map.get(withNamespace(AUTHORITIES));
         if (authorities instanceof String) {
             return AuthorityUtils.commaSeparatedStringToAuthorityList((String) authorities);
         }
