@@ -22,6 +22,26 @@ import static ucles.weblab.common.identity.auth0.UserDetailsManagerAuth0.GIVEN_N
  *
  * For OIDC Conformant JWTs we have to specify a namespace prefix
  */
+/*
+ Something like the following rule is needed in Auth0 to populate items in an OIDC conformant manner.
+
+    function (user, context, callback) {
+      var namespace = 'http://ucles.org.uk/';
+      if (context.idToken) {
+        // For OpenID Connect conformance
+        context.idToken[namespace + 'user_name'] = user.user_id;
+        context.idToken[namespace + 'nickname'] = user.nickname;
+        context.idToken[namespace + 'authorities'] =
+          user.app_metadata && user.app_metadata.authorities;
+        context.idToken[namespace + 'ielts'] =
+          user.app_metadata && user.app_metadata.ielts;
+        // Spring mappings (must not enable OIDC conformance on Client)
+        context.idToken.user_name = user.user_id;
+        context.idToken.authorities = user.app_metadata && user.app_metadata.authorities;
+      }
+      callback(null, user, context);
+    }
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationConverter {
@@ -29,6 +49,7 @@ public class Auth0UserAuthenticationConverter extends DefaultUserAuthenticationC
     /** Prefix for property within the JWT.  e.g. http://ucles.org.uk/ */
     private final String namespacePrefix;
 
+    /** e.g. 'nickname' for the human readable username to populate Spring Security Authentication with */
     private final String usernameAttributeKey;
 
 
