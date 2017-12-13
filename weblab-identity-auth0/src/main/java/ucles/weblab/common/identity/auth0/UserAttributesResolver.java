@@ -17,6 +17,8 @@ import ucles.weblab.common.identity.ExtendedUser;
 @Slf4j
 public class UserAttributesResolver {
 
+    private static final String NICKNAME_CLAIM = "http://ucles.org.uk/nickname";
+
     private final Authentication authentication;
 
     public String getUsername() {
@@ -41,11 +43,11 @@ public class UserAttributesResolver {
     public String getNickname() {
         if (authentication instanceof JwtAuthentication) {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
-            return details.getClaim("nickname").asString();
+            return details.getClaim(NICKNAME_CLAIM).asString();
         }
         Object principal = authentication.getPrincipal();
         if (principal instanceof ExtendedUser) {
-            return (String) ((ExtendedUser) principal).getMetadata().get("nickname");
+            return (String) ((ExtendedUser) principal).getMetadata().get(NICKNAME_CLAIM);
         }
         return (String) principal;
     }
