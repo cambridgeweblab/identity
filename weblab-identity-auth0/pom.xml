@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>weblab-common-java</artifactId>
+        <artifactId>weblab-identity</artifactId>
         <groupId>ucles.weblab</groupId>
         <version>0.5-SNAPSHOT</version>
     </parent>
@@ -15,6 +15,7 @@
     <properties>
         <auth0.version>1.1.0</auth0.version>
         <auth0-spring-security-api.version>1.0.0-rc.2</auth0-spring-security-api.version>
+        <spring-boot.version>1.5.3.RELEASE</spring-boot.version>
         <spring-security-oauth2.version>2.0.14.RELEASE</spring-security-oauth2.version>
     </properties>
 
