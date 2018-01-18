@@ -5,7 +5,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.spring.security.api.authentication.AuthenticationJsonWebToken;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
@@ -24,9 +23,6 @@ public class UserAttributesResolverTest {
 
     private final String someUserId = "someuserid";
     private final String someName = "freda";
-
-    @Mock
-    private Authentication authentication;
 
     @Test
     public void shouldReturnJWTWhenGetId() {
