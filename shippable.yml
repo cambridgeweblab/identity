@@ -9,7 +9,8 @@ build:
   ci:
     - mkdir -p shippable/testresults
     - mvn --batch-mode clean
-    - mvn --batch-mode -Pshippable deploy
+    - if [[ $BRANCH == "master" ]] && [[ $IS_PULL_REQUEST == true ]]; then mvn --batch-mode -Pshippable verify; fi
+    - if [[ $BRANCH == "master" ]] && [[ $IS_PULL_REQUEST != true ]]; then mvn --batch-mode -Pshippable deploy; fi
 
 integrations:
   notifications:
