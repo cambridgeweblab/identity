@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import ucles.weblab.common.identity.ExtendedUser;
 
 /**
@@ -29,6 +30,11 @@ public class UserAttributesResolver {
         if (authentication instanceof JwtAuthentication) {
             DecodedJWT details = (DecodedJWT) authentication.getDetails();
             return details.getClaim("sub").asString();
+        }
+
+        if (authentication instanceof OAuth2Authentication) {
+            OAuth2Authentication auth2Authentication = (OAuth2Authentication) authentication;
+            return auth2Authentication.getUserAuthentication().getPrincipal().toString();
         }
 
         if (authentication.getPrincipal() instanceof ExtendedUser) {
