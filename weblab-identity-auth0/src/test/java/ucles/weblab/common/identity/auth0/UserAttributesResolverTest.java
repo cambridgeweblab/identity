@@ -46,8 +46,7 @@ public class UserAttributesResolverTest {
         UserAttributesResolver userAttributesResolver = new UserAttributesResolver(oAuth2Authentication);
 
         when(oAuth2Authentication.getUserAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(principal);
-        when(principal.toString()).thenReturn(someUserId);
+        when(authentication.getName()).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
     }
