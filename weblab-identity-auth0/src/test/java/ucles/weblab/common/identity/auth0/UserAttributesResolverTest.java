@@ -46,7 +46,26 @@ public class UserAttributesResolverTest {
         UserAttributesResolver userAttributesResolver = new UserAttributesResolver(oAuth2Authentication);
 
         when(oAuth2Authentication.getUserAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(someUserId);
+        when(authentication.getPrincipal()).thenReturn(principal);
+        when(principal.toString()).thenReturn(someUserId);
+
+        assertEquals(userAttributesResolver.getUserId(), someUserId);
+    }
+
+    @Test
+    public void shouldReturnOAuth2ExtendedUserWhenGetId() {
+        OAuth2Authentication oAuth2Authentication = mock(OAuth2Authentication.class);
+        Authentication authentication = mock(Authentication.class);
+
+        ExtendedUser extendedUser = mock(ExtendedUser.class);
+        UserAttributesResolver userAttributesResolver = new UserAttributesResolver(authentication);
+        Map<String, Object> map = new HashMap<>();
+        map.put("sub", someUserId);
+
+
+        when(oAuth2Authentication.getUserAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(extendedUser);
+        Mockito.doReturn(map).when(extendedUser).getMetadata();
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
     }
