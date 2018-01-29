@@ -34,16 +34,26 @@ public class UserAttributesResolver {
 
         if (authentication instanceof OAuth2Authentication) {
             OAuth2Authentication auth2Authentication = (OAuth2Authentication) authentication;
-            return auth2Authentication.getUserAuthentication().getName();
+            Object principal = auth2Authentication.getUserAuthentication().getPrincipal();
+
+            if (principal instanceof ExtendedUser) {
+                return getUserIdFromExtendedUser(principal);
+            } else {
+                return principal.toString();
+            }
         }
 
         if (authentication.getPrincipal() instanceof ExtendedUser) {
-            return (String) ((ExtendedUser) authentication.getPrincipal()).getMetadata().get("sub");
+            return getUserIdFromExtendedUser(authentication.getPrincipal());
         }
 
         String uid = "user|" + authentication.getName();
         log.warn("Returning fabricated id: {} for getUserId for Authentication: {}", uid, authentication.getClass().toString());
         return uid;
+    }
+
+    private String getUserIdFromExtendedUser(Object principal) {
+        return (String) ((ExtendedUser) principal).getMetadata().get("sub");
     }
 
     public String getNickname() {
