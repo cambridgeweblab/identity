@@ -34,7 +34,7 @@ public class UserAttributesResolver {
 
         if (authentication instanceof OAuth2Authentication) {
             OAuth2Authentication auth2Authentication = (OAuth2Authentication) authentication;
-            return auth2Authentication.getUserAuthentication().getPrincipal().toString();
+            return auth2Authentication.getUserAuthentication().getName();
         }
 
         if (authentication.getPrincipal() instanceof ExtendedUser) {
