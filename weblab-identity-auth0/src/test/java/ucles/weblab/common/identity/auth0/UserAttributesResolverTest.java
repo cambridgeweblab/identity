@@ -36,6 +36,7 @@ public class UserAttributesResolverTest {
         when(claim.asString()).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
+        verify(decodedJWT, times(1)).getClaim("sub");
     }
 
     @Test
@@ -50,6 +51,7 @@ public class UserAttributesResolverTest {
         when(principal.toString()).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
+        verify(authentication, never()).getName();
     }
 
     @Test
@@ -59,15 +61,16 @@ public class UserAttributesResolverTest {
 
         ExtendedUser extendedUser = mock(ExtendedUser.class);
         UserAttributesResolver userAttributesResolver = new UserAttributesResolver(authentication);
-        Map<String, Object> map = new HashMap<>();
-        map.put("sub", someUserId);
-
+        Map<String, Object> map = mock(HashMap.class);
 
         when(oAuth2Authentication.getUserAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(extendedUser);
         Mockito.doReturn(map).when(extendedUser).getMetadata();
+        when(map.get("sub")).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
+        verify(map, times(1)).get("sub");
+        verify(authentication, never()).getName();
     }
 
     @Test
@@ -75,13 +78,14 @@ public class UserAttributesResolverTest {
         Authentication authentication = mock(Authentication.class);
         ExtendedUser extendedUser = mock(ExtendedUser.class);
         UserAttributesResolver userAttributesResolver = new UserAttributesResolver(authentication);
-        Map<String, Object> map = new HashMap<>();
-        map.put("sub", someUserId);
+        Map<String, Object> map = mock(HashMap.class);
 
         when(authentication.getPrincipal()).thenReturn(extendedUser);
         Mockito.doReturn(map).when(extendedUser).getMetadata();
+        when(map.get("sub")).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
+        verify(map, times(1)).get("sub");
     }
 
     @Test
