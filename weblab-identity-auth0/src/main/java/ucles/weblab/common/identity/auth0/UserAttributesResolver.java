@@ -37,14 +37,14 @@ public class UserAttributesResolver {
             Object principal = auth2Authentication.getUserAuthentication().getPrincipal();
 
             if (principal instanceof ExtendedUser) {
-                return getUserIdFromExtendedUser(principal);
+                return getUserIdFromExtendedUser((ExtendedUser) principal);
             } else {
                 return principal.toString();
             }
         }
 
         if (authentication.getPrincipal() instanceof ExtendedUser) {
-            return getUserIdFromExtendedUser(authentication.getPrincipal());
+            return getUserIdFromExtendedUser((ExtendedUser) authentication.getPrincipal());
         }
 
         String uid = "user|" + authentication.getName();
@@ -52,8 +52,8 @@ public class UserAttributesResolver {
         return uid;
     }
 
-    private String getUserIdFromExtendedUser(Object principal) {
-        return (String) ((ExtendedUser) principal).getMetadata().get("sub");
+    private String getUserIdFromExtendedUser(ExtendedUser principal) {
+        return (String) principal.getMetadata().get("sub");
     }
 
     public String getNickname() {
