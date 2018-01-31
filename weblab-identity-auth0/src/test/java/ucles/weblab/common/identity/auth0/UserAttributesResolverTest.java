@@ -44,15 +44,11 @@ public class UserAttributesResolverTest {
         OAuth2Authentication oAuth2Authentication = mock(OAuth2Authentication.class);
         Authentication authentication = mock(Authentication.class);
         Object principal = mock(Object.class);
-        DecodedJWT details = mock(DecodedJWT.class);
-        Claim claim = mock(Claim.class);
         UserAttributesResolver userAttributesResolver = new UserAttributesResolver(oAuth2Authentication);
 
         when(oAuth2Authentication.getUserAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(principal);
-        when(oAuth2Authentication.getDetails()).thenReturn(details);
-        when(details.getClaim(any(String.class))).thenReturn(claim);
-        when(claim.asString()).thenReturn(someUserId);
+        when(principal.toString()).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
         verify(authentication, never()).getName();
