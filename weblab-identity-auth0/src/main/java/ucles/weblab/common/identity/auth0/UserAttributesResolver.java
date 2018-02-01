@@ -9,8 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import ucles.weblab.common.identity.ExtendedUser;
 
-import static org.springframework.util.Assert.notNull;
-
 /**
  * A strategy for resolving attributes based on what authentication mechanism we are using.
  *
@@ -37,13 +35,11 @@ public class UserAttributesResolver {
         if (authentication instanceof OAuth2Authentication) {
             OAuth2Authentication auth2Authentication = (OAuth2Authentication) authentication;
             Object principal = auth2Authentication.getUserAuthentication().getPrincipal();
-            DecodedJWT auth2Details = (DecodedJWT) auth2Authentication.getUserAuthentication().getDetails();
 
             if (principal instanceof ExtendedUser) {
                 return getUserIdFromExtendedUser((ExtendedUser) principal);
             } else {
-                notNull(auth2Details, "Additional details about the authentication request is not used");
-                return auth2Details.getClaim("sub").asString();
+                return principal.toString();
             }
         }
 
