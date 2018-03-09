@@ -5,8 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.spring.security.api.authentication.AuthenticationJsonWebToken;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import ucles.weblab.common.identity.ExtendedUser;
@@ -15,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -60,12 +58,12 @@ public class UserAttributesResolverTest {
         Authentication authentication = mock(Authentication.class);
 
         ExtendedUser extendedUser = mock(ExtendedUser.class);
-        UserAttributesResolver userAttributesResolver = new UserAttributesResolver(authentication);
+        UserAttributesResolver userAttributesResolver = new UserAttributesResolver(oAuth2Authentication);
         Map<String, Object> map = mock(HashMap.class);
 
         when(oAuth2Authentication.getUserAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(extendedUser);
-        Mockito.doReturn(map).when(extendedUser).getMetadata();
+        doReturn(map).when(extendedUser).getMetadata();
         when(map.get("sub")).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
@@ -81,7 +79,7 @@ public class UserAttributesResolverTest {
         Map<String, Object> map = mock(HashMap.class);
 
         when(authentication.getPrincipal()).thenReturn(extendedUser);
-        Mockito.doReturn(map).when(extendedUser).getMetadata();
+        doReturn(map).when(extendedUser).getMetadata();
         when(map.get("sub")).thenReturn(someUserId);
 
         assertEquals(userAttributesResolver.getUserId(), someUserId);
