@@ -14,7 +14,6 @@
 
     <properties>
         <auth0.version>1.1.0</auth0.version>
-        <auth0-spring-security-api.version>1.0.0-rc.2</auth0-spring-security-api.version>
         <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
         <spring-security-oauth2.version>2.2.0.RELEASE</spring-security-oauth2.version>
     </properties>
@@ -59,6 +58,12 @@
             <version>${spring-boot.version}</version>
             <optional>true</optional>
         </dependency>
+
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <!-- LOMBOK -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -69,11 +74,6 @@
             <groupId>com.auth0</groupId>
             <artifactId>auth0</artifactId>
             <version>${auth0.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.auth0</groupId>
-            <artifactId>auth0-spring-security-api</artifactId>
-            <version>${auth0-spring-security-api.version}</version>
         </dependency>
 
         <!-- TEST -->
