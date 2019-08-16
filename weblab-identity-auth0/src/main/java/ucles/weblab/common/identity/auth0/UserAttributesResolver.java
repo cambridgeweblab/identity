@@ -1,7 +1,5 @@
 package ucles.weblab.common.identity.auth0;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.spring.security.api.authentication.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -27,11 +25,6 @@ public class UserAttributesResolver {
     }
 
     public String getUserId() {
-        if (authentication instanceof JwtAuthentication) {
-            DecodedJWT details = (DecodedJWT) authentication.getDetails();
-            return details.getClaim("sub").asString();
-        }
-
         if (authentication instanceof OAuth2Authentication) {
             OAuth2Authentication auth2Authentication = (OAuth2Authentication) authentication;
             Object principal = auth2Authentication.getUserAuthentication().getPrincipal();
@@ -57,10 +50,6 @@ public class UserAttributesResolver {
     }
 
     public String getNickname() {
-        if (authentication instanceof JwtAuthentication) {
-            DecodedJWT details = (DecodedJWT) authentication.getDetails();
-            return details.getClaim(NICKNAME_CLAIM).asString();
-        }
         Object principal = authentication.getPrincipal();
         if (principal instanceof ExtendedUser) {
             return (String) ((ExtendedUser) principal).getMetadata().get(NICKNAME_CLAIM);
